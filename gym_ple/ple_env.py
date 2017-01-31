@@ -6,24 +6,30 @@ import numpy as np
 class PLEEnv(gym.Env):
     metadata = {'render.modes': ['human', 'rgb_array']}
 
-    def __init__(self, game_name='FlappyBird', display_screen=True):
+    def __init__(self, game_name='FlappyBird', display_screen=True, visual=True):
         # open up a game state to communicate with emulator
         import importlib
         game_module_name = ('ple.games.%s' % game_name).lower()
         game_module = importlib.import_module(game_module_name)
         game = getattr(game_module, game_name)()
-        self.game_state = PLE(game, fps=30, display_screen=display_screen)
+        
+        
+        self.game_state = PLE(game, fps=30, display_screen=display_screen, state_preprocessor=np.array)
         self.game_state.init()
         self._action_set = self.game_state.getActionSet()
         self.action_space = spaces.Discrete(len(self._action_set))
-        self.screen_width, self.screen_height = self.game_state.getScreenDims()
-        self.observation_space = spaces.Box(low=0, high=255, shape=(self.screen_width, self.screen_height, 3))
-        self.viewer = None
-
+        
+        self.visual = visual
+        if visual:
+            self.screen_width, self.screen_height = self.game_state.getScreenDims()
+            self.observation_space = spaces.Box(low=0, high=255, shape=(self.screen_width, self.screen_height, 3))
+            self.viewer = None
+        else:
+            self.observation_space = game.getGameSpace()
 
     def _step(self, a):
         reward = self.game_state.act(self._action_set[a])
-        state = self._get_image()
+        state = self._get_image() if self.visual else self.game_state.getGameState()
         terminal = self.game_state.game_over()
         return state, reward, terminal, {}
 
@@ -37,9 +43,9 @@ class PLEEnv(gym.Env):
 
     # return: (states, observations)
     def _reset(self):
-        self.observation_space = spaces.Box(low=0, high=255, shape=(self.screen_width, self.screen_height, 3))
+        #self.observation_space = spaces.Box(low=0, high=255, shape=(self.screen_width, self.screen_height, 3))
         self.game_state.reset_game()
-        state = self._get_image()
+        state = self._get_image() if self.visual else self.game_state.getGameState()
         return state
 
     def _render(self, mode='human', close=False):
