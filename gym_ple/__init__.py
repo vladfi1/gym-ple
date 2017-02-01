@@ -13,7 +13,7 @@ def registerPLE(game, **kwargs):
         id='ple/{}-v0'.format(game),
         entry_point='gym_ple:PLEEnv',
         kwargs=kwargs_,
-        tags={'wrapper_config.TimeLimit.max_episode_steps': 10000},
+        tags={'wrapper_config.TimeLimit.max_episode_steps': 10000, 'ple': True},
         nondeterministic=False,
     )
 
