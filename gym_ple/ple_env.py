@@ -23,9 +23,9 @@ class PLEEnv(gym.Env):
         if visual:
             self.screen_width, self.screen_height = self.game_state.getScreenDims()
             self.observation_space = spaces.Box(low=0, high=255, shape=(self.screen_width, self.screen_height, 3))
-            self.viewer = None
         else:
             self.observation_space = game.getGameSpace()
+        self.viewer = None
 
     def _step(self, a):
         reward = self.game_state.act(self._action_set[a])
