@@ -22,3 +22,6 @@ for game in ['Catcher', 'MonsterKong', 'FlappyBird', 'PixelCopter', 'PuckWorld',
 
 for game in ['Pong']:
     registerPLE(game+'NV', game_name=game, visual=False)
+    
+for game in ['CatcherNonVisual']:
+    registerPLE(game+'NV', game_name='Catcher', visual=False)
